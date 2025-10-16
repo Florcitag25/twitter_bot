@@ -2,6 +2,7 @@ import tweepy
 import constants
 import requests
 import logging
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 #Recibir mensajes de exito o error del bot
 """ logging.basicConfig(level=logging.INFO, filename='bot.log', filemode='a',
@@ -30,9 +31,10 @@ def create_tweet(client,text):
 #Valor de la Key para API clima
 weather_key = constants.WEATHER_API_KEY
 
-#Extrar del API del clima informacion sobre mi ciudad
-
 
 client = create_client(constants.CONSUMER_KEY,constants.CONSUMER_SECRET,constants.ACCESS_TOKEN,constants.ACCESS_TOKEN_SECRET)
 temp = str(get_weather(weather_key,"Salta","AR"))
-create_tweet(client,temp)
+scheduler = BlockingScheduler()
+scheduler.add_job(create_tweet,"interval",hours=1,args=[client,temp])
+scheduler.start()
+
